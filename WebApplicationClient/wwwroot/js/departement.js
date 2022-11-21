@@ -26,7 +26,7 @@ $(document).ready(function () {
                     return `
                     <a class="btn btn-primary text-light" data-bs-toggle="modal" data-bs-target="#departementEditModal" onclick="showEdit(${data})" >Edit</a> |
                     <a class="btn btn-info text-light" data-bs-toggle="modal" data-bs-target="#departementDetailsModal" onclick="showDetail(${data})">Details</a> |
-                    <a class="btn btn-danger text-light" data-bs-toggle="modal" data-bs-target="#" onclick="showDelete(${data})">Delete</a>
+                    <a class="btn btn-danger text-light"  onclick="showDelete(${data})">Delete</a>
 
         `;
                 }
@@ -51,8 +51,7 @@ $(document).ready(function () {
 
     )
 
-    document.querySelector('.dt-buttons').classList.add("mb-3")
-    document.querySelector('.dt-buttons').classList.add("me-3")
+    table.buttons().container().addClass("mb-3 me-3")
 
 })
 
@@ -103,9 +102,6 @@ function showDetail(departementId) {
 }
 
 function showEdit(departementId) {
-
-    
-
     //populated division options
     $.ajax({
         url: "https://localhost:7002/api/division",
@@ -213,16 +209,18 @@ function sendEdit() {
 
 
 
-const deleteSwalAlert = Swal.mixin({
-    customClass: {
-        confirmButton: 'btn btn-success',
-        cancelButton: 'btn btn-danger'
-    },
-    buttonsStyling: false
-})
 
 
 function showDelete(departementId) {
+
+
+    const deleteSwalAlert = Swal.mixin({
+        customClass: {
+            confirmButton: 'btn btn-success',
+            cancelButton: 'btn btn-danger'
+        },
+        buttonsStyling: false
+    })
 
 
     deleteSwalAlert.fire({

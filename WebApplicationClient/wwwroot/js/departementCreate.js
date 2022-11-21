@@ -19,18 +19,22 @@ $.ajax({
 })
 
 
-const createSwalAlert = Swal.mixin({
-    customClass: {
-        confirmButton: 'btn btn-success',
-        cancelButton: 'btn btn-danger'
-    },
-    buttonsStyling: false
-})
+
 
 document.querySelector('form').addEventListener('submit', (event) => {
     event.preventDefault()
 
     const formElement = event.target
+
+    console.log(formElement.checkValidity())
+
+    if (!formElement.checkValidity()) {
+
+        event.stopPropagation()
+        formElement.classList.add('was-validated')
+        return
+    } 
+
 
     const formData = new FormData(formElement);
 
@@ -42,6 +46,14 @@ document.querySelector('form').addEventListener('submit', (event) => {
         name: enteredDepartementName,
         divisionId: enteredDivisionId
     }
+
+    const createSwalAlert = Swal.mixin({
+        customClass: {
+            confirmButton: 'btn btn-success',
+            cancelButton: 'btn btn-danger'
+        },
+        buttonsStyling: false
+    })
 
      createSwalAlert.fire({
         title: 'Are you sure?',
