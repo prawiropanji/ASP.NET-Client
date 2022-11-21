@@ -35,10 +35,34 @@ $(document).ready(function () {
         dom: 'Bfrtip',
         buttons: {
             buttons: [
-                { extend: 'copy', className: 'btn-secondary' },
-                { extend: 'colvis', className: 'btn-secondary' },
-                { extend: 'pdf', className: 'btn-secondary' },
-                { extend: 'excel', className: 'btn-secondary' }
+                {
+                    extend: 'copy',
+                    className: 'btn-secondary',
+                    exportOptions: {
+                        columns: [0]
+                    }
+                },
+                {
+                    extend: 'colvis',
+                    className: 'btn-secondary',
+                    exportOptions: {
+                        columns: [0]
+                    }
+                },
+                {
+                    extend: 'pdf',
+                    className: 'btn-secondary',
+                    exportOptions: {
+                        columns: [0]
+                    }
+                },
+                {
+                    extend: 'excel',
+                    className: 'btn-secondary',
+                    exportOptions: {
+                        columns: [0]
+                    }
+                }
             ],
             dom: {
                 button: {
