@@ -19,6 +19,14 @@ $.ajax({
 })
 
 
+const createSwalAlert = Swal.mixin({
+    customClass: {
+        confirmButton: 'btn btn-success',
+        cancelButton: 'btn btn-danger'
+    },
+    buttonsStyling: false
+})
+
 document.querySelector('form').addEventListener('submit', (event) => {
     event.preventDefault()
 
@@ -35,20 +43,55 @@ document.querySelector('form').addEventListener('submit', (event) => {
         divisionId: enteredDivisionId
     }
 
-    console.log(data);
+     createSwalAlert.fire({
+        title: 'Are you sure?',
+        text: "Data will be saved in database",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, create it!',
+        cancelButtonText: 'No, cancel!',
+        reverseButtons: true
+    }).then((result) => {
 
-    $.ajax({
-        url: 'https://localhost:7002/api/departement',
-        type: 'POST',
-        contentType: 'application/json',
-        dataType: 'json',
-        data: JSON.stringify(data)
-    }).done(res => {
-        console.log(res);
-        formElement.reset();
+        if (result.isConfirmed) {
 
 
+
+            console.log(data);
+
+            $.ajax({
+                url: 'https://localhost:7002/api/departement',
+                type: 'POST',
+                contentType: 'application/json',
+                dataType: 'json',
+                data: JSON.stringify(data)
+            }).done(res => {
+                console.log(res);
+                //formElement.reset();
+                //document.querySelector('#closeModal').reset();
+
+
+            })
+
+
+            createSwalAlert.fire(
+                'Createed!',
+                'row has been added.',
+                'success'
+            )
+        } else if (
+            /* Read more about handling dismissals below */
+            result.dismiss === Swal.DismissReason.cancel
+        ) {
+            createSwalAlert.fire(
+                'Cancelled',
+                'make sure you entered right data :)',
+                'error'
+            )
+        }
     })
+
+
 
 })
 

@@ -1,0 +1,14 @@
+﻿nav.layout-navbar,
+#layout-menu
+{
+    z-index: 2 !important;
+}
+
+.modal-backdrop{
+    z-index: 3;
+}
+
+
+.modal{
+    z-index: 4;
+}

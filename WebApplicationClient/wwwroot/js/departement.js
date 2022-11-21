@@ -26,28 +26,38 @@ $(document).ready(function () {
                     return `
                     <a class="btn btn-primary text-light" data-bs-toggle="modal" data-bs-target="#departementEditModal" onclick="showEdit(${data})" >Edit</a> |
                     <a class="btn btn-info text-light" data-bs-toggle="modal" data-bs-target="#departementDetailsModal" onclick="showDetail(${data})">Details</a> |
-                    <a class="btn btn-danger text-light" data-bs-toggle="modal" data-bs-target="#departementDeleteModal" onclick="showDelete(${data})">Delete</a>
+                    <a class="btn btn-danger text-light" data-bs-toggle="modal" data-bs-target="#" onclick="showDelete(${data})">Delete</a>
 
         `;
                 }
             }
         ],
         dom: 'Bfrtip',
-        buttons: ['copy', 'pdf', 'colvis', 'excel']
+        buttons: {
+            buttons: [
+                { extend: 'copy', className: 'btn btn-secondary' },
+                { extend: 'colvis', className: 'btn btn-secondary' },
+                { extend: 'pdf', className: 'btn btn-secondary' },
+                { extend: 'excel', className: 'btn btn-secondary' }
+            ],
+            dom: {
+                button: {
+                    className: 'btn'
+                }
+            }
+        }
 
-    })
+    }
 
+    )
 
-    //setInterval(function () {
-    //    table.ajax.reload(null, false); // user paging is not reset on reload
-    //}, 3000);
+    document.querySelector('.dt-buttons').classList.add("mb-3")
+    document.querySelector('.dt-buttons').classList.add("me-3")
 
 })
 
 
 function showDetail(departementId) {
-
-
     $.ajax({
         url: `https://localhost:7002/api/departement/${departementId}`,
         type: "GET"
@@ -143,68 +153,116 @@ function showEdit(departementId) {
 
 
 function sendEdit() {
-    console.log(table)
 
-    //table.ajax.reload(json => {
-    //    console.log(json)
-    //}, false);
-
-
-
-    const enteredDepartName = document.querySelector('#departNameInput').value;
-    const enteredDivisionId = document.querySelector('#divisionSelect').value
-    const departementId = document.querySelector('#modalEdit').parentElement.querySelector('button[type="submit"]').id;
+    Swal.fire({
+        title: 'Do you want to save the changes?',
+        showDenyButton: true,
+        confirmButtonText: 'Save',
+        denyButtonText: `Don't save`,
+    }).then((result) => {
+        /* Read more about isConfirmed, isDenied below */
+        if (result.isConfirmed) {
 
 
+            const enteredDepartName = document.querySelector('#departNameInput').value;
+            const enteredDivisionId = document.querySelector('#divisionSelect').value
+            const departementId = document.querySelector('#modalEdit').parentElement.querySelector('button[type="submit"]').id;
+
+            const data = {
+                id: departementId,
+                name: enteredDepartName,
+                divisionId: enteredDivisionId
+            }
+
+            console.log(data);
 
 
-    const data = {
-        id: departementId,
-        name: enteredDepartName,
-        divisionId: enteredDivisionId
-    }
-
-    console.log(data);
+            $('#departementEditModal').modal('hide');
 
 
-    //update row table value
-    let rowData = table.row((num, rowVal) => rowVal.id == departementId).data()
-    rowData.name = enteredDepartName;
-    rowData.divisionId = enteredDivisionId
-    table.row((num, rowVal) => rowVal.id == departementId).data(rowData).draw()
+            //update row table value UI 
+            let rowData = table.row((num, rowVal) => rowVal.id == departementId).data()
+            rowData.name = enteredDepartName;
+            rowData.divisionId = enteredDivisionId
+            table.row((num, rowVal) => rowVal.id == departementId).data(rowData).draw()
 
 
-    console.log(table.row((num, rowVal) => rowVal.id == departementId))
-    console.log(rowData)
+            console.log(table.row((num, rowVal) => rowVal.id == departementId))
+            console.log(rowData)
 
+            //send updated data to api
+            $.ajax({
+                url: 'https://localhost:7002/api/departement',
+                type: 'PUT',
+                contentType: 'application/json',
+                dataType: 'json',
+                data: JSON.stringify(data)
+            }).done(res => {
+                console.log(res);
+            })
 
-    $.ajax({
-        url: 'https://localhost:7002/api/departement',
-        type: 'PUT',
-        contentType: 'application/json',
-        dataType: 'json',
-        data: JSON.stringify(data)
-    }).done(res => {
-        console.log(res);
- 
-
-
+            Swal.fire('Saved!', '', 'success')
+        } else if (result.isDenied) {
+            Swal.fire('Changes are not saved', '', 'info')
+        }
     })
+
+
+
 }
+
+
+
+const deleteSwalAlert = Swal.mixin({
+    customClass: {
+        confirmButton: 'btn btn-success',
+        cancelButton: 'btn btn-danger'
+    },
+    buttonsStyling: false
+})
 
 
 function showDelete(departementId) {
 
-    const deletButtonEl = document.querySelector('#departementDeleteModal .modal-footer button:last-of-type')
-    deletButtonEl.id = departementId
-    deletButtonEl.addEventListener('click', deleteData)
 
+    deleteSwalAlert.fire({
+        title: 'Are you sure?',
+        text: "this action may result in data loss",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, delete it!',
+        cancelButtonText: 'No, cancel!',
+        reverseButtons: true
+    }).then((result) => {
+     
+        if (result.isConfirmed) {
+            deleteData(departementId);
+
+            deleteSwalAlert.fire(
+                'Deleted!',
+                'row has been deleted.',
+                'success'
+            )
+        } else if (
+            /* Read more about handling dismissals below */
+            result.dismiss === Swal.DismissReason.cancel
+        ) {
+            deleteSwalAlert.fire(
+                'Cancelled',
+                'Your row is safe :)',
+                'error'
+            )
+        }
+    })
 
 }
 
-function deleteData() {
 
-    const departementId = document.querySelector('#departementDeleteModal .modal-footer button:last-of-type').id
+
+
+function deleteData(departementId) {
+
+
 
     table.row((num, rowVal) => rowVal.id == departementId).remove().draw()
 
@@ -216,3 +274,5 @@ function deleteData() {
 
     })
 }
+
+
